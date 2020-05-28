@@ -94,7 +94,7 @@ public class DefaultControllerTest {
   }
 
   @Test
-  public void testControllerStopsWorkingWhenReconcilerAbortsWithRuntimeException()
+  public void testControllerKeepsWorkingWhenReconcilerAbortsWithRuntimeException()
       throws InterruptedException {
     AtomicBoolean aborts = new AtomicBoolean(true);
     AtomicBoolean resumed = new AtomicBoolean(false);
@@ -126,10 +126,11 @@ public class DefaultControllerTest {
     // emit another event, the previous one has been backoff'd
     Request request2 = new Request("test2");
     workQueue.add(request2);
+    cooldown();
     testController.shutdown();
 
-    assertFalse(resumed.get());
-    assertEquals(0, finishedRequests.size());
+    assertTrue(resumed.get());
+    assertTrue(finishedRequests.size() >= 1);
   }
 
   private class MockReconciler implements Reconciler {
