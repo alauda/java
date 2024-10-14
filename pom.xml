@@ -17,7 +17,6 @@
     <module>client-java-contrib/cert-manager</module>
     <module>e2e</module>
     <module>client-java-contrib/prometheus-operator</module>
-    <module>examples</module>
   </modules>
 
   <scm>
@@ -322,20 +321,7 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <layout>default</layout>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-      <layout>default</layout>
-    </repository>
-  </distributionManagement>
-
+  
   <build>
     <pluginManagement>
       <plugins>
@@ -431,16 +417,6 @@
           <releaseProfiles>release-sign-artifacts</releaseProfiles>
           <goals>deploy</goals>
           <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
       <plugin>
