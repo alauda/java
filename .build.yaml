@@ -1,0 +1,80 @@
+apiVersion: builds.katanomi.dev/v1alpha1
+kind: Build
+spec:
+  workspaces:
+    - description: |
+        This workspace is shared among all the pipeline tasks to read/write common resources
+      name: source
+    - name: cache
+  tasks:
+    - name: maven
+      timeout: 30m
+      retries: 0
+      taskRef:
+        resolver: katanomi.hub
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: maven
+      workspaces:
+        - name: source
+          workspace: source
+        - name: cache
+          workspace: cache
+      when: []
+      params:
+        - name: command
+          value: |
+            mvn versions:set -DnewVersion=11.0.0-alauda-$(build.git.lastCommit.shortID); mvn clean deploy -DskipTests
+        - name: dependencies-repositories
+          value:
+            - https://build-nexus.alauda.cn/repository/alauda-maven/
+        - name: deploy-repository
+          value: https://build-nexus.alauda.cn/repository/alauda-maven/
+  git:
+    options:
+      depth: 1
+      timeout: 10m
+      retries: 0
+      resources:
+        limits:
+          cpu: 200m
+          memory: 200Mi
+        requests:
+          cpu: 200m
+          memory: 200Mi
+  runTemplate:
+    spec:
+      workspaces:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: build-cache
+          subPath: maven
+      taskRunSpecs:
+        - pipelineTaskName: maven
+          stepOverrides:
+            - name: prepare
+              resources:
+                requests:
+                  cpu: 1333m
+                  memory: 1365Mi
+                limits:
+                  cpu: 4000m
+                  memory: 4096Mi
+            - name: maven
+              resources:
+                requests:
+                  cpu: 1333m
+                  memory: 1365Mi
+                limits:
+                  cpu: 4000m
+                  memory: 4096Mi
+            - name: analysis
+              resources:
+                requests:
+                  cpu: 1334m
+                  memory: 1366Mi
+                limits:
+                  cpu: 4000m
+                  memory: 4096Mi
